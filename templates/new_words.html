@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Новые слова{% endblock %}
+
+{% block header %}
+{% if changes == 'new' %}
+Новые слова
+{% elif changes == 'familiar' %}
+Немного знакомые слова
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% include 'includes/exer_changer.html' %}
+{% for word in page %}
+{% include 'includes/word_card.html' %}
+{% endfor %}
+{% include 'includes/paginator.html' %}
+{% endblock %}

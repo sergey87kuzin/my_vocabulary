@@ -2,6 +2,10 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
 
+NEW_LIST = ('[2400, 2401, 2402, 2403, 2404, 2405, 2406, 2407, 2408, 2409, '
+            '2410, 2411, 2412, 2413, 2414]')
+
+
 class MyUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -38,16 +42,26 @@ class User(AbstractBaseUser):
         blank=True,
         null=True
     )
-    username = models.CharField(max_length=150, unique=True,
-                                verbose_name='username')
-    password = models.CharField(max_length=150, verbose_name='password',
-                                blank=True)
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        verbose_name='username'
+    )
+    password = models.CharField(
+        max_length=150,
+        verbose_name='password',
+        blank=True
+    )
+    new_list = models.CharField(max_length=100, default=NEW_LIST)
+    familiar_list = models.CharField(max_length=100, default=NEW_LIST)
+    known_list = models.CharField(max_length=100, default=NEW_LIST)
+    known_idx = models.IntegerField(default=0)
 
     objects = MyUserManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'username'
     USER_ID_FIELD = 'id'
-    REQUIRED_FIELDS = ['password', 'username']
+    REQUIRED_FIELDS = ['password', 'email']
 
     class Meta:
         verbose_name = 'пользователь'
@@ -55,7 +69,7 @@ class User(AbstractBaseUser):
         ordering = ('-id',)
 
     def __str__(self):
-        return self.email
+        return self.username
 
     def has_perm(self, perm, obj=None):
         return True
@@ -89,7 +103,7 @@ class Word(models.Model):
     )
 
     class Meta:
-        ordering = ('english',)
+        ordering = ('russian',)
 
     def __str__(self):
         return self.english

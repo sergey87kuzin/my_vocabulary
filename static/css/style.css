@@ -1,0 +1,92 @@
+@import './_variables.css';
+
+body {
+    background: rgba(229, 231, 230, 0.959);
+    font: 18px Arial, sans-serif;
+  }
+  h1 {
+    font-family: Calibri;
+    font-style: italic;
+    color: black;
+    text-align: center;
+  }
+  h2 {
+    font-family: Calibri;
+    font-style: italic;
+    color: black;
+    text-align: center;
+  }
+  .container {
+    vertical-align: 10cm;
+
+  }
+  .navbar {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1cm 1cm;
+  }
+  .pagination {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1cm 0cm;
+  }
+  
+  .page-link {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1px 1px;
+    border: 1px solid rgb(114, 208, 231);
+
+    /* hover {
+      z-index: 2;
+      color: $pagination-hover-color;
+      text-decoration: none;
+      background-color: $pagination-hover-bg;
+      border-color: $pagination-hover-border-color;
+    } */
+  
+    &:focus {
+      z-index: 2;
+      outline: $pagination-focus-outline;
+      box-shadow: $pagination-focus-box-shadow;
+    }
+  }
+  
+    &.active .page-link {
+      z-index: 1;
+      color: $pagination-active-color;
+      background-color: $pagination-active-bg;
+      border-color: $pagination-active-border-color;
+    }
+  
+    &.disabled .page-link {
+      color: $pagination-disabled-color;
+      pointer-events: none;
+      cursor: auto;
+      background-color: $pagination-disabled-bg;
+      border-color: $pagination-disabled-border-color;
+    }
+  }
+  
+  
+  //
+  // Sizing
+  //
+  
+  .pagination-lg {
+    @include pagination-size($pagination-padding-y-lg, $pagination-padding-x-lg, $font-size-lg, $line-height-lg, $border-radius-lg);
+  }
+  
+  .pagination-sm {
+    @include pagination-size($pagination-padding-y-sm, $pagination-padding-x-sm, $font-size-sm, $line-height-sm, $border-radius-sm);
+  }
+  

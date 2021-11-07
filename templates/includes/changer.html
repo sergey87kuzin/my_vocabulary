@@ -1,0 +1,36 @@
+{% if user.is_authenticated %}
+<div class='row' style='justify-content: center'>
+  {% if has_words == '+' %}
+  <ul class='nav nav-tabs' style='align-content: center'>
+    <li class='nav-item'>
+      <a class='nav-link {% if index %}active{% endif %}' href="{% url 'index' %}">
+        Все слова
+      </a>
+    </li>
+    <li class='nav-item'></li>
+      <a class='nav-link {% if index %}active{% endif %}' href="{% url 'get_new' %}">
+        Новые слова
+      </a>
+    </li>
+    <li class='nav-item'></li>
+      <a class='nav-link {% if index %}active{% endif %}' href="{% url 'get_familiar' %}">
+        Смутно знакомые слова
+      </a>
+    </li>
+    <li class='nav-item'></li>
+      <a class='nav-link {% if index %}active{% endif %}' href="{% url 'get_known' %}">
+        Упражнения на перевод
+      </a>
+    </li>
+  </ul>
+  {% elif has_words == '-' %}
+  <ul class='nav nav-tabs'>
+    <li class='nav-item'>
+      <a class='nav-link {% if index %}active{% endif %}' href="{% url 'get_words' %}">
+        Начать
+      </a>
+    </li>
+  </ul>
+  {% endif %}
+</div>
+{% endif %}

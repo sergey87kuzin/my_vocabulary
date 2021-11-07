@@ -12,6 +12,7 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ('username', 'email')
     fieldsets = (
         (None, {'fields': ('email', 'password', 'is_staff')}),
+        ('Lists', {'fields': ('new_list', 'familiar_list', 'known_list')}),
         ('Personal info', {'fields': ('username', )}),
     )
     add_fieldsets = (
@@ -37,7 +38,7 @@ class WordAdmin(admin.ModelAdmin):
         'id', 'english', 'russian'
     )
     search_fields = ('english',)
-    list_filter = ('english', 'russian')
+    list_filter = ('russian', 'english')
     empty_value_display = '-пусто-'
 
 

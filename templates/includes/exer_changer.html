@@ -1,0 +1,26 @@
+{% if user.is_authenticated %}
+<div class='row' style='justify-content: center'>
+  <ul class='nav nav-tabs'>
+    <li class='nav-item'>
+      <a class='nav-link {% if index %}active{% endif %}' href="{% url 'index' %}">
+        Вернуться к общему списку
+      </a>
+    </li>
+    <li class='nav-item'></li>
+      <a class='nav-link {% if index %}active{% endif %}' href="{% url 'get_new' %}">
+        Еще чуть-чуть новых слов
+      </a>
+    </li>
+    <li class='nav-item'></li>
+      <a class='nav-link {% if index %}active{% endif %}' href="{% url 'get_familiar' %}">
+        Повторить смутно знакомые слова
+      </a>
+    </li>
+    <li class='nav-item'></li>
+      <a class='nav-link {% if index %}active{% endif %}' href="{% url 'get_known' %}">
+        Упражнения на перевод
+      </a>
+    </li>
+  </ul>
+</div>
+{% endif %}
