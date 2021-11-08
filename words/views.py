@@ -7,7 +7,7 @@ from django.views.generic import CreateView
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import CreationForm, TranslateForm
+from .forms import CreationForm
 from .models import Word, Rating
 
 
@@ -69,13 +69,15 @@ def get_new_words(request):
     words = list(Word.objects.all())
     ratings = [Rating(user=user, word=word, rating=0) for word in words]
     Rating.objects.bulk_create(ratings)
-    return redirect('familiar')
+    return redirect('new')
 
 
 @login_required
 def show_new_words(request):
     queryset = []
     word_ids = request.user.new_list[1:-1].split(', ')
+    if len(word_ids) == 0:
+        return redirect('get_new')
     for word_id in word_ids:
         word = get_object_or_404(Word, id=word_id)
         queryset.append(word)
@@ -102,6 +104,9 @@ def show_new_words(request):
 def show_familiar_words(request):
     queryset = []
     word_ids = request.user.familiar_list[1:-1].split(', ')
+    if len(word_ids) == 0:
+        return redirect('new')
+    print(len(word_ids))
     for word_id in word_ids:
         word = get_object_or_404(Word, id=word_id)
         queryset.append(word)
@@ -125,28 +130,9 @@ def show_familiar_words(request):
 
 
 @login_required
-def translate(request):
-    words_id = request.user.known_list[1:-1].split(', ')
-    print(words_id)
-    idx = request.user.known_idx
-    word = get_object_or_404(Word, id=words_id[idx])
-    form = TranslateForm(request.POST or None)
-    print(word.russian)
-    if form.is_valid():
-        print(form.cleaned_data['russian'])
-        if form.cleaned_data.get('russian') == word.russian:
-            request.user.known_idx = idx + 1
-            request.user.save()
-            return redirect('translate')
-        return redirect('new')
-    return render(request, 'translate.html', {'form': form,
-                                              'word': word, })
-
-
-@login_required
 def get_familiar_list(request):
     word_ids = list(Rating.objects.filter(
-        user=request.user, rating__in=[1, 2]
+        user=request.user, rating__in=[1, 2, 3]
     ).values_list('word', flat=True))
     random.shuffle(word_ids)
     for word_id in word_ids[:15]:
@@ -181,6 +167,12 @@ def get_new_list(request):
 
 @login_required
 def get_known_list(request):
+    redirs = {
+        'english': 'translate_to_english',
+        'russian': 'translate',
+        'eng_let': 'word_from_letters_english',
+        'rus_let': 'word_from_letters_russian'
+    }
     word_ids = list(Rating.objects.filter(
         user=request.user, rating__gte=3
     ).values_list('word', flat=True))
@@ -195,4 +187,5 @@ def get_known_list(request):
     request.user.known_list = word_ids[:15]
     request.user.known_idx = 0
     request.user.save()
-    return redirect('translate')
+    redir = request.GET.get('later')
+    return redirect(redirs[redir])

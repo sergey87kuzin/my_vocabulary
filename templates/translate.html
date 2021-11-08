@@ -7,7 +7,11 @@
 {% endblock %}
 {% block content %}
 <div class='card-body'>
-<div> {{ word.english }} </div>
+  {% if lang == 'english' %}
+  <div> {{ word.english }} </div>
+  {% elif lang == 'russian' %}
+  <div> {{ word.russian }} </div>
+  {% endif %}
 <form method='post' enctype='multipart/form-data'>
   {% csrf_token %}
   <div class='form-group'>

@@ -27,4 +27,8 @@ class CreationForm(UserCreationForm):
 
 
 class TranslateForm(forms.Form):
-    russian = forms.CharField(label='Перевод на русский', max_length=100)
+    russian = forms.CharField(label='Перевод на русский   ', max_length=100)
+
+
+class TranslateEnglishForm(forms.Form):
+    english = forms.CharField(label='Перевод на английский   ', max_length=100)

@@ -16,9 +16,28 @@
         Повторить смутно знакомые слова
       </a>
     </li>
+  </ul>
+</div>
+<div class='row' style='justify-content: center'>
+  <ul class='nav nav-tabs' style='align-content: center'>
     <li class='nav-item'></li>
-      <a class='nav-link {% if index %}active{% endif %}' href="{% url 'get_known' %}">
-        Упражнения на перевод
+      <a class='nav-link {% if index %}active{% endif %}' href='/get_known/?later=english'>
+        Перевод на английский
+      </a>
+    </li>
+    <li class='nav-item'></li>
+      <a class='nav-link {% if index %}active{% endif %}' href='/get_known/?later=russian'>
+        Перевод на русский
+      </a>
+    </li>
+    <li class='nav-item'></li>
+      <a class='nav-link {% if index %}active{% endif %}' href='/get_known/?later=eng_let'>
+        Перевод на русский из букв
+      </a>
+    </li>
+    <li class='nav-item'></li>
+      <a class='nav-link {% if index %}active{% endif %}' href='/get_known/?later=rus_let'>
+        Перевод на английский из букв
       </a>
     </li>
   </ul>
