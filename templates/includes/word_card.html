@@ -3,5 +3,13 @@
     <div class='card-text-2' style='text-align: center;'>
       <h2>{{ word.english|linebreaksbr }} - {{ word.russian|linebreaksbr }}</h2>
     </div>
+    <div style='text-align: center;'>
+      <form method="POST">
+        {% csrf_token %}
+      <button type='submit' name='low' value={{ word.id }}>Малознакомое</button>
+      <button type='submit' name='medium' value={{ word.id }}>Узнаваемое</button>
+      <button type='submit' name='high' value={{ word.id }}>Хорошо знакомое</button>
+    </form>
+  </div>
   </div>
 </div>

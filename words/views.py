@@ -94,6 +94,7 @@ def show_new_words(request):
     else:
         pages = [x for x in range(1, min(num_pages + 1, 16))]
     page = paginator.get_page(page_no)
+    buttons_under_word(request)
     return render(
         request, 'new_words.html',
         {'page': page, 'changes': 'new', 'pages': pages}
@@ -123,6 +124,7 @@ def show_familiar_words(request):
     else:
         pages = [x for x in range(1, min(num_pages + 1, 16))]
     page = paginator.get_page(page_no)
+    buttons_under_word(request)
     return render(
         request, 'new_words.html',
         {'page': page, 'changes': 'new', 'pages': pages}
@@ -131,17 +133,21 @@ def show_familiar_words(request):
 
 @login_required
 def get_familiar_list(request):
-    word_ids = list(Rating.objects.filter(
-        user=request.user, rating__in=[1, 2, 3]
-    ).values_list('word', flat=True))
+    # word_ids = list(Rating.objects.filter(
+    #     user=request.user, rating__in=[1, 2, 3]
+    # ).values_list('word', flat=True))
+    # for word_id in word_ids[:15]:
+    #     word = get_object_or_404(Word, id=word_id)
+    #     rating = get_object_or_404(
+    #         Rating, user=request.user, word=word
+    #     )
+    #     rating.rating += 1
+    #     rating.save()
+    words = Word.objects.filter(
+        is_well_known=True
+    ).values_list('id')
+    word_ids = [x[0] for x in words]
     random.shuffle(word_ids)
-    for word_id in word_ids[:15]:
-        word = get_object_or_404(Word, id=word_id)
-        rating = get_object_or_404(
-            Rating, user=request.user, word=word
-        )
-        rating.rating += 1
-        rating.save()
     request.user.familiar_list = word_ids[:15]
     request.user.save()
     return redirect('familiar')
@@ -149,18 +155,10 @@ def get_familiar_list(request):
 
 @login_required
 def get_new_list(request):
-    word_ids = list(Rating.objects.filter(
-        user=request.user, rating=0
-    ).values_list('word', flat=True))
+    words = Word.objects.filter(is_new=True).values_list('id')
+    word_ids = [x[0] for x in words]
     random.shuffle(word_ids)
     request.user.new_list = word_ids[:15]
-    for word_id in word_ids[:15]:
-        word = get_object_or_404(Word, id=word_id)
-        rating = get_object_or_404(
-            Rating, user=request.user, word=word
-        )
-        rating.rating += 1
-        rating.save()
     request.user.save()
     return redirect('new')
 
@@ -173,19 +171,28 @@ def get_known_list(request):
         'eng_let': 'word_from_letters_english',
         'rus_let': 'word_from_letters_russian'
     }
-    word_ids = list(Rating.objects.filter(
-        user=request.user, rating__gte=3
-    ).values_list('word', flat=True))
+    words = Word.objects.filter(is_new=True).values_list('id')
+    word_ids = [x[0] for x in words]
     random.shuffle(word_ids)
-    for word_id in word_ids[:15]:
-        word = get_object_or_404(Word, id=word_id)
-        rating = get_object_or_404(
-            Rating, user=request.user, word=word
-        )
-        rating.rating += 1
-        rating.save()
     request.user.known_list = word_ids[:15]
     request.user.known_idx = 0
     request.user.save()
     redir = request.GET.get('later')
     return redirect(redirs[redir])
+
+
+def change_status(request, button, is_new, is_med, is_well):
+    curr_word = Word.objects.get(id=request.POST[button])
+    curr_word.is_new = is_new
+    curr_word.is_well_known = is_med
+    curr_word.is_known = is_well
+    curr_word.save()
+
+
+def buttons_under_word(request):
+    if 'low' in request.POST:
+        change_status(request, 'low', True, False, False)
+    if 'medium' in request.POST:
+        change_status(request, 'medium', False, True, False)
+    if 'high' in request.POST:
+        change_status(request, 'high', False, False, True)

@@ -38,7 +38,7 @@ class WordAdmin(admin.ModelAdmin):
         'id', 'english', 'russian'
     )
     search_fields = ('english',)
-    list_filter = ('russian', 'english')
+    list_filter = ('is_new', 'is_well_known', 'is_known')
     empty_value_display = '-пусто-'
 
 
