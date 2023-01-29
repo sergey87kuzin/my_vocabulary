@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src=https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js></script>
+</head>
+<body>
+    <div class=valute>
+        <p>курс Тенге сегодня: <span class=kzt></span> рублей</p>
+    </div>
+    <hr>
+    <div class=convert>
+        <p>Рубли: <input type=text class=kzt-input></p>
+        <p>Сумма в тенге: <span class=kzt-in-rub>0 Тенге</span></p>
+    </div>
+    <script>
+        const KZTviuw = document.querySelector(".kzt")
+        const kztInRub = document.querySelector(".kzt-in-rub")
+        const kztInput = document.querySelector(".kzt-input")
+        const valute = {
+            KZT: ""
+        }
+        axios.get("https://www.cbr-xml-daily.ru/daily_json.js")
+            .then((res) => {
+                valute.KZT = res.data.Valute.KZT.Value
+                KZTviuw.textContent = valute.KZT
+            })
+
+        kztInput.addEventListener("change", () => {
+            if (!Number.isInteger(+kztInput.value)) {
+                kztInRub.textContent = "Вы ввели не число"
+            } else if (kztInput.value === "") {
+                kztInRub.textContent = 0
+            } else {
+                kztInRub.textContent = Math.round(+kztInput.value / valute.KZT) + " Руб"
+            }
+        })
+    </script>
+</body>
+</html>

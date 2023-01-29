@@ -22,5 +22,5 @@ urlpatterns = [
     # Все адреса с префиксом /auth
     # будут прернаправлены в модуль django.contrib.auth
     path('auth/', include('django.contrib.auth.urls')),
-    path('', include('words.urls'))
+    path('api/', include('words.urls'))
 ]

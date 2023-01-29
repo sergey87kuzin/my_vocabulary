@@ -35,7 +35,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 class WordAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'english', 'russian'
+        'id', 'russian', 'english'
     )
     search_fields = ('english',)
     list_filter = ('is_new', 'is_well_known', 'is_known')

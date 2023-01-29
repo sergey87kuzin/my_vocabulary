@@ -1,15 +1,22 @@
-import re
 import random
+import re
+import json
+import math
 
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse_lazy
-from django.views.generic import CreateView
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from rest_framework import viewsets
+from rest_framework.decorators import api_view
+from rest_framework.mixins import ListModelMixin, UpdateModelMixin
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 from .forms import CreationForm
-from .models import Word, Rating
-
+from .models import Rating, Word
+from .serializers import WordCreateSerializer, WordSerializer
 
 pattern_eng = r'([a-z\(\) ]+)'
 pattern_rus = r'([а-яё, ]+)'
@@ -21,6 +28,69 @@ class SignUp(CreateView):
     success_url = reverse_lazy('index')
     template_name = 'users/signup.html'
 
+
+class WordsViewSet(viewsets.GenericViewSet, ListModelMixin, UpdateModelMixin):
+    pass
+
+
+class AllViewSet(WordsViewSet):
+    queryset = Word.objects.all()
+    lookup_field = 'id'
+    pagination_class = PageNumberPagination
+    # serializer_class = WordSerializer
+
+    def get_serializer_class(self):
+        if self.action in ['update', 'partial_update']:
+            return WordCreateSerializer
+        return WordSerializer
+
+
+class NewViewSet(WordsViewSet):
+    queryset = Word.objects.filter(is_new=True)
+    lookup_field = 'id'
+    serializer_class = WordSerializer
+    pagination_class = PageNumberPagination
+
+
+class FamiliarViewSet(WordsViewSet):
+    queryset = Word.objects.filter(is_well_known=True)
+    lookup_field = 'id'
+    serializer_class = WordSerializer
+    pagination_class = PageNumberPagination
+
+
+class KnownViewSet(WordsViewSet):
+    queryset = Word.objects.filter(is_known=True)
+    lookup_field = 'id'
+    serializer_class = WordSerializer
+    pagination_class = PageNumberPagination
+
+
+@api_view(['post'])
+def check_words(request):
+    # with open('request.json', 'w') as f:
+    #     json.dump(
+    #         obj=request, fp=f, ensure_ascii=False, indent=2,
+    #         separators=(',', ': ')
+    #     )
+    word_id = request.data.get('id')
+    answer = request.data.get('answer')
+    word = Word.objects.get(id=word_id)
+    if answer in word.russian or answer in word.english:
+        return Response('Верно')
+    return Response(f'Неверно, {word.english} - {word.russian}')
+
+
+@api_view(['get'])
+def get_word_for_excercise(request):
+    words = Word.objects.filter(is_known=True)
+    index = math.floor(len(words) * random.random())
+    word = words[index]
+    serializer = WordSerializer(word)
+    return Response(serializer.data)
+
+
+# ---------------------------------------------------------------------------------- #
 
 def index(request):
     word_list = Word.objects.all()
@@ -143,9 +213,7 @@ def get_familiar_list(request):
     #     )
     #     rating.rating += 1
     #     rating.save()
-    words = Word.objects.filter(
-        is_well_known=True
-    ).values_list('id')
+    words = Word.objects.filter(is_well_known=True).values_list('id')
     word_ids = [x[0] for x in words]
     random.shuffle(word_ids)
     request.user.familiar_list = word_ids[:15]
@@ -171,7 +239,7 @@ def get_known_list(request):
         'eng_let': 'word_from_letters_english',
         'rus_let': 'word_from_letters_russian'
     }
-    words = Word.objects.filter(is_new=True).values_list('id')
+    words = Word.objects.filter(is_known=True).values_list('id')
     word_ids = [x[0] for x in words]
     random.shuffle(word_ids)
     request.user.known_list = word_ids[:15]
@@ -179,6 +247,13 @@ def get_known_list(request):
     request.user.save()
     redir = request.GET.get('later')
     return redirect(redirs[redir])
+
+
+@login_required
+def wrong_answer(request, word_id, later):
+    word = Word.objects.get(id=word_id)
+    context = {'later': later, 'word': word}
+    return render(request, 'wrong_answer.html', context=context)
 
 
 def change_status(request, button, is_new, is_med, is_well):

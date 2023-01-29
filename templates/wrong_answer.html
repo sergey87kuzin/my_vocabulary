@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Неверный ответ{% endblock %}
+
+{% block header %}
+Неверный ответ
+{% endblock %}
+
+{% block content %}
+{% include 'includes/word_card.html' %}
+<a class='nav-link {% if index %}active{% endif %}' href='/get_known/?later={{ later }}'>
+    Продолжить
+</a>
+{% endblock %}

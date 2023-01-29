@@ -17,9 +17,7 @@ def translate_to_english(request):
     word = get_object_or_404(Word, id=words_id[idx])
     answer = word.english.split(' ')
     form = TranslateEnglishForm(request.POST or None)
-    print(word.russian)
     if form.is_valid():
-        print(form.cleaned_data['english'])
         if form.cleaned_data.get('english') in answer:
             if idx == 14:
                 request.user.known_idx = 0
@@ -28,7 +26,9 @@ def translate_to_english(request):
             request.user.known_idx = idx + 1
             request.user.save()
             return redirect('translate_to_english')
-        return redirect('new')
+        return redirect(
+            'wrong_answer', word_id=word.id, later='english'
+        )
     return render(request, 'translate.html', {'form': form,
                                               'lang': lang,
                                               'word': word, })
@@ -42,11 +42,9 @@ def translate(request):
         return redirect('new')
     idx = request.user.known_idx
     word = get_object_or_404(Word, id=words_id[idx])
-    answers = word.russian.split(', ')
+    answers = word.russian.split(' ')
     form = TranslateForm(request.POST or None)
-    print(word.russian)
     if form.is_valid():
-        print(form.cleaned_data['russian'])
         if form.cleaned_data.get('russian') in answers:
             if idx == 14:
                 request.user.known_idx = 0
@@ -55,7 +53,9 @@ def translate(request):
             request.user.known_idx = idx + 1
             request.user.save()
             return redirect('translate')
-        return redirect('new')
+        return redirect(
+            'wrong_answer', word_id=word.id, later='russian'
+        )
     return render(request, 'translate.html', {'form': form,
                                               'lang': lang,
                                               'word': word, })
@@ -70,22 +70,13 @@ def words_from_letters_english(request):
         return redirect('new')
     idx = request.user.known_idx
     word = get_object_or_404(Word, id=words_id[idx])
-    if '(' in word.russian:
-        answers = word.russian.split(' (')
-        random_word = list(answers[0])
-    elif ',' in word.russian:
-        answers = word.russian.split(', ')
-        random_word = list(answers[0])
-    else:
-        answers.append(word.russian)
-        random_word = list(word.russian)
+    answers = word.russian.split(' ')
+    random_word = list(answers[0])
     random.shuffle(random_word)
     rand = '  '.join(random_word)
     form = TranslateForm(request.POST or None)
     template = 'translate_from_letters.html'
-    print(word.russian)
     if form.is_valid():
-        print(form.cleaned_data['russian'])
         if form.cleaned_data.get('russian') in answers:
             if idx == 14:
                 request.user.known_idx = 0
@@ -94,7 +85,9 @@ def words_from_letters_english(request):
             request.user.known_idx = idx + 1
             request.user.save()
             return redirect('word_from_letters_english')
-        return redirect('new')
+        return redirect(
+            'wrong_answer', word_id=word.id, later='eng_let'
+        )
     return render(request, template, {'form': form,
                                       'lang': lang,
                                       'rand': rand,
@@ -110,22 +103,13 @@ def words_from_letters_russian(request):
     if len(words_id) == 0:
         return redirect('new')
     word = get_object_or_404(Word, id=words_id[idx])
-    if '(' in word.english:
-        answers = word.english.split(' (')
-        random_word = list(answers[0])
-    elif ',' in word.english:
-        answers = word.english.split(', ')
-        random_word = list(answers[0])
-    else:
-        answers.append(word.english)
-        random_word = list(word.english)
+    answers = word.english.split(' ')
+    random_word = list(answers[0])
     random.shuffle(random_word)
     rand = '  '.join(random_word)
     form = TranslateEnglishForm(request.POST or None)
     template = 'translate_from_letters.html'
-    print(word.english)
     if form.is_valid():
-        print(form.cleaned_data['english'])
         if form.cleaned_data.get('english') in answers:
             if idx == 14:
                 request.user.known_idx = 0
@@ -134,7 +118,9 @@ def words_from_letters_russian(request):
             request.user.known_idx = idx + 1
             request.user.save()
             return redirect('word_from_letters_russian')
-        return redirect('new')
+        return redirect(
+            'wrong_answer', word_id=word.id, later='rus_let'
+        )
     return render(request, template, {'form': form,
                                       'lang': lang,
                                       'rand': rand,

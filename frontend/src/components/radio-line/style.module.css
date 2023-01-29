@@ -1,0 +1,8 @@
+.isKnownForm {
+    display: flex;
+    height: auto;
+    width: 100%;
+    justify-content: space-around;
+    flex-direction: row;
+    border: none;
+}
